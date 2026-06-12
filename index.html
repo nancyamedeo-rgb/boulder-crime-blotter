@@ -200,26 +200,25 @@ function processData(data) {
     return null;
   }
 
+  // Field names confirmed from console log:
+  // Report_Number, Report_Title, Report_Date, Report_Year, Report_Month,
+  // Report_Month_Num, Report_Day, Report_Day_Num, Report_Hour,
+  // auto_narrative, STAddress, ESRI_OID, tweet_date
   var typeKey = pickField(
-    ['Offense_Type','OFFENSE_TYPE','offense_type','OffenseType',
-     'Incident_Type','INCIDENT_TYPE','incident_type','IncidentType',
-     'Crime_Type','CRIME_TYPE','crime_type','Offense','OFFENSE','Type','TYPE'],
-    /offense|incident_type|crime_type/i
+    ['Report_Title', 'report_title'],
+    /report_title/i
   );
   var addrKey = pickField(
-    ['Address','ADDRESS','Block_Address','BLOCK_ADDRESS',
-     'Incident_Address','INCIDENT_ADDRESS','Location','LOCATION'],
-    /address|location/i
+    ['STAddress', 'staddress', 'Address', 'ADDRESS'],
+    /staddress|^address$/i
   );
   var dateKey = pickField(
-    ['Report_Date','REPORT_DATE','Reported_Date','REPORTED_DATE',
-     'Incident_Date','INCIDENT_DATE','Date','DATE'],
-    /report_date|reported_date|incident_date|^date$/i
+    ['Report_Date', 'report_date'],
+    /report_date/i
   );
   var caseKey = pickField(
-    ['Case_Number','CASE_NUMBER','Report_Number','REPORT_NUMBER',
-     'Case_No','CASE_NO','CaseNumber','ReportNumber'],
-    /case_num|case_no|report_num/i
+    ['Report_Number', 'report_number'],
+    /report_number/i
   );
 
   console.log('Mapped — type:', typeKey, '| addr:', addrKey, '| date:', dateKey, '| case:', caseKey);
@@ -257,9 +256,10 @@ function startLoad() {
     '<div id="status"><i class="ti ti-loader spin" style="font-size:20px;"></i> Loading…</div>';
 
   // Try proxies in order — corsproxy.io first, then thingproxy as fallback
+  var bust = '&_cb=' + Math.floor(Date.now() / 300000); // changes every 5 min
   var proxies = [
-    'https://corsproxy.io/?' + encodeURIComponent(ARCGIS_URL),
-    'https://thingproxy.freeboard.io/fetch/' + ARCGIS_URL
+    'https://corsproxy.io/?' + encodeURIComponent(ARCGIS_URL + bust),
+    'https://thingproxy.freeboard.io/fetch/' + ARCGIS_URL + bust
   ];
   var proxyIdx = 0;
 
