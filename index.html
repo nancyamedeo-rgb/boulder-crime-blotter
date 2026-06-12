@@ -7,11 +7,9 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.47.0/tabler-icons.min.css">
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
   :root {
     --bg: #111213;
-    --bg-surface: #1a1b1e;
-    --bg-hover: #222428;
+    --bg-hover: #1e2023;
     --border: rgba(255,255,255,0.08);
     --border-mid: rgba(255,255,255,0.14);
     --text-primary: #e8e8e8;
@@ -24,97 +22,16 @@
     --accent-gray: #525252;
     --info: #3d80c4;
   }
-
-  html, body {
-    height: 100%;
-    background: var(--bg);
-    color: var(--text-primary);
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
-    font-size: 13px;
-    line-height: 1.4;
-    -webkit-font-smoothing: antialiased;
-  }
-
-  #widget {
-    display: flex;
-    flex-direction: column;
-    height: 100vh;
-    max-width: 420px;
-    margin: 0 auto;
-  }
-
-  #header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 12px 16px 10px;
-    border-bottom: 0.5px solid var(--border);
-    flex-shrink: 0;
-  }
-
-  #header-left {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-
-  #header h1 {
-    font-size: 12px;
-    font-weight: 500;
-    letter-spacing: 0.07em;
-    text-transform: uppercase;
-    color: var(--text-primary);
-  }
-
-  #badge {
-    font-size: 10px;
-    font-weight: 600;
-    letter-spacing: 0.05em;
-    background: rgba(201, 64, 64, 0.18);
-    color: #e06060;
-    border: 0.5px solid rgba(201, 64, 64, 0.35);
-    padding: 2px 7px;
-    border-radius: 99px;
-  }
-
-  #refresh-btn {
-    display: flex;
-    align-items: center;
-    gap: 5px;
-    font-size: 11px;
-    color: var(--text-secondary);
-    background: none;
-    border: 0.5px solid var(--border-mid);
-    border-radius: 6px;
-    padding: 4px 10px;
-    cursor: pointer;
-    transition: background 0.15s;
-  }
-
+  html, body { height: 100%; background: var(--bg); color: var(--text-primary); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif; font-size: 13px; line-height: 1.4; -webkit-font-smoothing: antialiased; }
+  #widget { display: flex; flex-direction: column; height: 100vh; max-width: 420px; margin: 0 auto; }
+  #header { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px 10px; border-bottom: 0.5px solid var(--border); flex-shrink: 0; }
+  #header-left { display: flex; align-items: center; gap: 8px; }
+  #header h1 { font-size: 12px; font-weight: 500; letter-spacing: 0.07em; text-transform: uppercase; color: var(--text-primary); }
+  #badge { font-size: 10px; font-weight: 600; letter-spacing: 0.05em; background: rgba(201,64,64,0.18); color: #e06060; border: 0.5px solid rgba(201,64,64,0.35); padding: 2px 7px; border-radius: 99px; }
+  #refresh-btn { display: flex; align-items: center; gap: 5px; font-size: 11px; color: var(--text-secondary); background: none; border: 0.5px solid var(--border-mid); border-radius: 6px; padding: 4px 10px; cursor: pointer; }
   #refresh-btn:hover { background: var(--bg-hover); color: var(--text-primary); }
-
-  #filter-bar {
-    display: flex;
-    gap: 5px;
-    padding: 8px 16px;
-    border-bottom: 0.5px solid var(--border);
-    flex-wrap: wrap;
-    flex-shrink: 0;
-  }
-
-  .fchip {
-    font-size: 10px;
-    font-weight: 500;
-    padding: 3px 10px;
-    border-radius: 99px;
-    border: 0.5px solid var(--border-mid);
-    color: var(--text-secondary);
-    background: none;
-    cursor: pointer;
-    transition: all 0.15s;
-    letter-spacing: 0.03em;
-  }
-
+  #filter-bar { display: flex; gap: 5px; padding: 8px 16px; border-bottom: 0.5px solid var(--border); flex-wrap: wrap; flex-shrink: 0; }
+  .fchip { font-size: 10px; font-weight: 500; padding: 3px 10px; border-radius: 99px; border: 0.5px solid var(--border-mid); color: var(--text-secondary); background: none; cursor: pointer; transition: all 0.15s; letter-spacing: 0.03em; }
   .fchip:hover { color: var(--text-primary); border-color: rgba(255,255,255,0.25); }
   .fchip.active { color: #fff; border-color: transparent; }
   .fchip.active[data-cat="all"]      { background: rgba(255,255,255,0.12); }
@@ -123,155 +40,48 @@
   .fchip.active[data-cat="drug"]     { background: rgba(112,101,196,0.35); color: #a89ee0; }
   .fchip.active[data-cat="traffic"]  { background: rgba(30,144,112,0.35); color: #6dcaaa; }
   .fchip.active[data-cat="other"]    { background: rgba(82,82,82,0.4); color: #aaa; }
-
-  #list {
-    flex: 1;
-    overflow-y: auto;
-    scrollbar-width: thin;
-    scrollbar-color: var(--border-mid) transparent;
-  }
-
+  #list { flex: 1; overflow-y: auto; scrollbar-width: thin; scrollbar-color: var(--border-mid) transparent; }
   #list::-webkit-scrollbar { width: 4px; }
   #list::-webkit-scrollbar-track { background: transparent; }
   #list::-webkit-scrollbar-thumb { background: var(--border-mid); border-radius: 2px; }
-
-  .incident {
-    display: grid;
-    grid-template-columns: 3px 1fr auto;
-    gap: 0 10px;
-    align-items: start;
-    padding: 9px 16px;
-    border-bottom: 0.5px solid var(--border);
-    transition: background 0.1s;
-  }
-
+  .incident { display: grid; grid-template-columns: 3px 1fr auto; gap: 0 10px; align-items: start; padding: 9px 16px; border-bottom: 0.5px solid var(--border); transition: background 0.1s; }
   .incident:hover { background: var(--bg-hover); }
   .incident:last-child { border-bottom: none; }
-
-  .dot {
-    align-self: stretch;
-    min-height: 18px;
-    border-radius: 2px;
-    width: 3px;
-    margin-top: 1px;
-  }
-
+  .dot { align-self: stretch; min-height: 18px; border-radius: 2px; width: 3px; margin-top: 1px; }
   .dot.violent  { background: var(--accent-red); }
   .dot.property { background: var(--accent-amber); }
   .dot.drug     { background: var(--accent-purple); }
   .dot.traffic  { background: var(--accent-teal); }
   .dot.other    { background: var(--accent-gray); }
-
-  .inc-type {
-    font-size: 12px;
-    font-weight: 500;
-    color: var(--text-primary);
-    margin-bottom: 3px;
-    line-height: 1.3;
-  }
-
-  .inc-meta {
-    font-size: 10.5px;
-    color: var(--text-secondary);
-    display: flex;
-    flex-wrap: wrap;
-    gap: 6px;
-    align-items: center;
-  }
-
-  .inc-meta span {
-    display: flex;
-    align-items: center;
-    gap: 3px;
-  }
-
+  .inc-type { font-size: 12px; font-weight: 500; color: var(--text-primary); margin-bottom: 3px; line-height: 1.3; }
+  .inc-meta { font-size: 10.5px; color: var(--text-secondary); display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
   .inc-meta i { font-size: 10px; }
-
-  .inc-date {
-    font-size: 10px;
-    color: var(--text-dim);
-    white-space: nowrap;
-    padding-top: 2px;
-    text-align: right;
-  }
-
-  #status {
-    padding: 40px 16px;
-    text-align: center;
-    color: var(--text-secondary);
-    font-size: 13px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 10px;
-  }
-
+  .inc-date { font-size: 10px; color: var(--text-dim); white-space: nowrap; padding-top: 2px; text-align: right; }
+  #status { padding: 40px 16px; text-align: center; color: var(--text-secondary); font-size: 13px; display: flex; flex-direction: column; align-items: center; gap: 10px; }
   #status a { color: var(--info); font-size: 12px; }
-
-  #footer {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 7px 16px;
-    border-top: 0.5px solid var(--border);
-    flex-shrink: 0;
-  }
-
+  #footer { display: flex; justify-content: space-between; align-items: center; padding: 7px 16px; border-top: 0.5px solid var(--border); flex-shrink: 0; }
   #updated { font-size: 10px; color: var(--text-dim); }
-
-  #source-link {
-    font-size: 10px;
-    color: var(--info);
-    text-decoration: none;
-    display: flex;
-    align-items: center;
-    gap: 3px;
-    opacity: 0.8;
-  }
-
+  #source-link { font-size: 10px; color: var(--info); text-decoration: none; display: flex; align-items: center; gap: 3px; opacity: 0.8; }
   #source-link:hover { opacity: 1; text-decoration: underline; }
-
+  .legend { display: flex; gap: 10px; flex-wrap: wrap; padding: 6px 16px; border-bottom: 0.5px solid var(--border); flex-shrink: 0; }
+  .leg-item { display: flex; align-items: center; gap: 4px; font-size: 9.5px; color: var(--text-dim); }
+  .leg-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
   .spin { animation: spin 1s linear infinite; display: inline-block; }
   @keyframes spin { to { transform: rotate(360deg); } }
-
-  .legend {
-    display: flex;
-    gap: 10px;
-    flex-wrap: wrap;
-    padding: 6px 16px;
-    border-bottom: 0.5px solid var(--border);
-    flex-shrink: 0;
-  }
-
-  .leg-item {
-    display: flex;
-    align-items: center;
-    gap: 4px;
-    font-size: 9.5px;
-    color: var(--text-dim);
-  }
-
-  .leg-dot {
-    width: 6px; height: 6px;
-    border-radius: 50%;
-    flex-shrink: 0;
-  }
 </style>
 </head>
 <body>
 <div id="widget">
-
   <div id="header">
     <div id="header-left">
-      <i class="ti ti-shield-lock" style="font-size:15px; color:#666;" aria-hidden="true"></i>
+      <i class="ti ti-shield-lock" style="font-size:15px;color:#666;" aria-hidden="true"></i>
       <h1>Boulder Crime Blotter</h1>
       <span id="badge">BPD</span>
     </div>
-    <button id="refresh-btn" onclick="loadData()">
+    <button id="refresh-btn" onclick="startLoad()">
       <i class="ti ti-refresh" id="refresh-icon" style="font-size:11px;" aria-hidden="true"></i>Refresh
     </button>
   </div>
-
   <div id="filter-bar">
     <button class="fchip active" data-cat="all"      onclick="setFilter(this,'all')">All</button>
     <button class="fchip"        data-cat="violent"  onclick="setFilter(this,'violent')">Violent</button>
@@ -280,7 +90,6 @@
     <button class="fchip"        data-cat="traffic"  onclick="setFilter(this,'traffic')">Traffic</button>
     <button class="fchip"        data-cat="other"    onclick="setFilter(this,'other')">Other</button>
   </div>
-
   <div class="legend">
     <div class="leg-item"><div class="leg-dot" style="background:var(--accent-red)"></div>Violent</div>
     <div class="leg-item"><div class="leg-dot" style="background:var(--accent-amber)"></div>Property</div>
@@ -288,159 +97,176 @@
     <div class="leg-item"><div class="leg-dot" style="background:var(--accent-teal)"></div>Traffic</div>
     <div class="leg-item"><div class="leg-dot" style="background:var(--accent-gray)"></div>Other</div>
   </div>
-
   <div id="list">
-    <div id="status">
-      <i class="ti ti-loader spin" style="font-size:20px;"></i>
-      Loading incidents…
-    </div>
+    <div id="status"><i class="ti ti-loader spin" style="font-size:20px;"></i> Loading…</div>
   </div>
-
   <div id="footer">
     <span id="updated"></span>
     <a id="source-link" href="https://experience.arcgis.com/experience/b77f9ce8798b4d61905e2598aee4ec80" target="_blank">
       Full blotter <i class="ti ti-external-link" style="font-size:10px;" aria-hidden="true"></i>
     </a>
   </div>
-
 </div>
+
 <script>
-  let allIncidents = [];
-  let activeFilter = 'all';
+var allIncidents = [];
+var activeFilter = 'all';
+var loadTimer = null;
 
-  const VIOLENT  = ['ASSAULT','ROBBERY','HOMICIDE','RAPE','SEX OFFENSE','KIDNAP','ARSON','WEAPON','THREAT','MENACING','MURDER','BATTERY','SHOOTING','STRANGULATION'];
-  const PROPERTY = ['BURGLARY','THEFT','LARCENY','AUTO THEFT','MOTOR VEHICLE','TRESPASS','VANDALISM','DAMAGE','CRIMINAL MISCHIEF','FRAUD','FORGERY','SHOPLIFTING','EMBEZZLE','STOLEN'];
-  const DRUG     = ['DRUG','NARCOTIC','CONTROLLED SUBSTANCE','ALCOHOL','LIQUOR','INTOXICAT'];
-  const TRAFFIC  = ['TRAFFIC','CRASH','ACCIDENT','HIT AND RUN','HIT-AND-RUN','DUI','DRIVING'];
+// Confirmed service URL from DevTools network capture
+var SERVICE_URL = 'https://services.arcgis.com/ePKBjXrBZ2vEEgWd/arcgis/rest/services/BPD_Crime_Incident_Blotter/FeatureServer/0/query';
 
-  function categorize(type) {
-    if (!type) return 'other';
-    const u = type.toUpperCase();
-    if (TRAFFIC.some(t => u.includes(t)))  return 'traffic';
-    if (DRUG.some(t => u.includes(t)))     return 'drug';
-    if (VIOLENT.some(t => u.includes(t)))  return 'violent';
-    if (PROPERTY.some(t => u.includes(t))) return 'property';
-    return 'other';
+var VIOLENT  = ['ASSAULT','ROBBERY','HOMICIDE','RAPE','SEX OFFENSE','KIDNAP','ARSON','WEAPON','THREAT','MENACING','MURDER','BATTERY','SHOOTING','STRANGULATION'];
+var PROPERTY = ['BURGLARY','THEFT','LARCENY','AUTO THEFT','MOTOR VEHICLE','TRESPASS','VANDALISM','DAMAGE','CRIMINAL MISCHIEF','FRAUD','FORGERY','SHOPLIFTING','EMBEZZLE','STOLEN'];
+var DRUG     = ['DRUG','NARCOTIC','CONTROLLED SUBSTANCE','ALCOHOL','LIQUOR','INTOXICAT'];
+var TRAFFIC  = ['TRAFFIC','CRASH','ACCIDENT','HIT AND RUN','HIT-AND-RUN','DUI','DRIVING'];
+
+function categorize(type) {
+  if (!type) return 'other';
+  var u = type.toUpperCase();
+  for (var i = 0; i < TRAFFIC.length;  i++) if (u.indexOf(TRAFFIC[i])  !== -1) return 'traffic';
+  for (var i = 0; i < DRUG.length;     i++) if (u.indexOf(DRUG[i])     !== -1) return 'drug';
+  for (var i = 0; i < VIOLENT.length;  i++) if (u.indexOf(VIOLENT[i])  !== -1) return 'violent';
+  for (var i = 0; i < PROPERTY.length; i++) if (u.indexOf(PROPERTY[i]) !== -1) return 'property';
+  return 'other';
+}
+
+function fmtDate(ms) {
+  if (!ms) return '';
+  var d = new Date(ms), diff = Date.now() - d;
+  if (diff < 3600000)  return Math.floor(diff / 60000) + 'm ago';
+  if (diff < 86400000) return Math.floor(diff / 3600000) + 'h ago';
+  var days = Math.floor(diff / 86400000);
+  if (days < 7) return days + 'd ago';
+  return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+}
+
+function titleCase(s) {
+  if (!s) return '';
+  return s.toLowerCase().replace(/\b\w/g, function(c) { return c.toUpperCase(); });
+}
+
+function render() {
+  var list = document.getElementById('list');
+  var shown = activeFilter === 'all'
+    ? allIncidents
+    : allIncidents.filter(function(i) { return i.cat === activeFilter; });
+  if (!shown.length) {
+    list.innerHTML = '<div id="status">No incidents found for this filter.</div>';
+    return;
+  }
+  list.innerHTML = shown.slice(0, 100).map(function(inc) {
+    var addr = inc.address ? titleCase(inc.address) : 'Location withheld';
+    var type = inc.type    ? titleCase(inc.type)    : 'Unknown incident';
+    return '<div class="incident">' +
+      '<div class="dot ' + inc.cat + '"></div>' +
+      '<div>' +
+        '<div class="inc-type">' + type + '</div>' +
+        '<div class="inc-meta">' +
+          '<span><i class="ti ti-map-pin" aria-hidden="true"></i>' + addr + '</span>' +
+          (inc.case_no ? '<span><i class="ti ti-file-description" aria-hidden="true"></i>' + inc.case_no + '</span>' : '') +
+        '</div>' +
+      '</div>' +
+      '<div class="inc-date">' + fmtDate(inc.date) + '</div>' +
+    '</div>';
+  }).join('');
+}
+
+function setFilter(btn, cat) {
+  activeFilter = cat;
+  document.querySelectorAll('.fchip').forEach(function(b) { b.classList.remove('active'); });
+  btn.classList.add('active');
+  render();
+}
+
+// JSONP callback — ArcGIS calls this with the JSON payload
+window.__bpdCB = function(data) {
+  if (loadTimer) { clearTimeout(loadTimer); loadTimer = null; }
+  var el = document.getElementById('_jp');
+  if (el) el.parentNode.removeChild(el);
+
+  document.getElementById('refresh-icon').classList.remove('spin');
+
+  if (!data || data.error || !Array.isArray(data.features) || !data.features.length) {
+    showError('Service returned no data.');
+    return;
   }
 
-  function fmtDate(ms) {
-    if (!ms) return '';
-    const d = new Date(ms);
-    const diff = Date.now() - d;
-    if (diff < 3600000)   return Math.floor(diff / 60000) + 'm ago';
-    if (diff < 86400000)  return Math.floor(diff / 3600000) + 'h ago';
-    const days = Math.floor(diff / 86400000);
-    if (days < 7)         return days + 'd ago';
-    return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-  }
+  allIncidents = data.features.map(function(f) {
+    var a = f.attributes;
+    // Field names confirmed from the service: Report_Date, Offense_Type, Address (or similar)
+    // We'll detect them dynamically in case they shift
+    var keys = Object.keys(a);
+    var typeKey = keys.find(function(k) { return /offense.type/i.test(k) || /incident.type/i.test(k) || /crime.type/i.test(k); }) || '';
+    var addrKey = keys.find(function(k) { return /address/i.test(k) && !/email/i.test(k); }) || '';
+    var dateKey = keys.find(function(k) { return /report.date/i.test(k); }) ||
+                  keys.find(function(k) { return /incident.date/i.test(k); }) ||
+                  keys.find(function(k) { return /date/i.test(k); }) || '';
+    var caseKey = keys.find(function(k) { return /case.number/i.test(k) || /report.number/i.test(k); }) || '';
+    var typeVal = typeKey ? (a[typeKey] || '') : '';
+    return {
+      type:    typeVal,
+      address: addrKey ? (a[addrKey] || '') : '',
+      date:    dateKey ? a[dateKey] : null,
+      case_no: caseKey ? (a[caseKey] || '') : '',
+      cat:     categorize(typeVal)
+    };
+  });
 
-  function titleCase(s) {
-    if (!s) return '';
-    return s.toLowerCase().replace(/\b\w/g, c => c.toUpperCase());
-  }
+  document.getElementById('updated').textContent =
+    'Updated ' + new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  render();
+};
 
-  function render() {
-    const list = document.getElementById('list');
-    const shown = activeFilter === 'all'
-      ? allIncidents
-      : allIncidents.filter(i => i.cat === activeFilter);
+function showError(msg) {
+  document.getElementById('list').innerHTML =
+    '<div id="status">' +
+      '<i class="ti ti-wifi-off" style="font-size:24px;color:#555;"></i>' +
+      '<span>' + (msg || 'Could not reach Boulder open data.') + '</span>' +
+      '<a href="https://experience.arcgis.com/experience/b77f9ce8798b4d61905e2598aee4ec80" target="_blank">View full blotter ↗</a>' +
+    '</div>';
+}
 
-    if (!shown.length) {
-      list.innerHTML = '<div id="status">No incidents found for this filter.</div>';
-      return;
-    }
+function startLoad() {
+  document.getElementById('refresh-icon').classList.add('spin');
+  document.getElementById('list').innerHTML =
+    '<div id="status"><i class="ti ti-loader spin" style="font-size:20px;"></i> Loading…</div>';
 
-    list.innerHTML = shown.slice(0, 80).map(inc => {
-      const addr = inc.address ? titleCase(inc.address) : 'Location withheld';
-      const type = inc.type    ? titleCase(inc.type)    : 'Unknown incident';
-      return `<div class="incident">
-        <div class="dot ${inc.cat}"></div>
-        <div>
-          <div class="inc-type">${type}</div>
-          <div class="inc-meta">
-            <span><i class="ti ti-map-pin" aria-hidden="true"></i>${addr}</span>
-            ${inc.case_no ? `<span><i class="ti ti-file-description" aria-hidden="true"></i>${inc.case_no}</span>` : ''}
-          </div>
-        </div>
-        <div class="inc-date">${fmtDate(inc.date)}</div>
-      </div>`;
-    }).join('');
-  }
+  // Remove any previous script tag
+  var old = document.getElementById('_jp');
+  if (old) old.parentNode.removeChild(old);
 
-  function setFilter(btn, cat) {
-    activeFilter = cat;
-    document.querySelectorAll('.fchip').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    render();
-  }
+  var script = document.createElement('script');
+  script.id = '_jp';
+  script.src = SERVICE_URL +
+    '?f=json' +
+    '&cacheHint=true' +
+    '&where=1%3D1' +
+    '&orderByFields=Report_Date%20DESC' +
+    '&outFields=*' +
+    '&resultRecordCount=250' +
+    '&returnGeometry=false' +
+    '&callback=__bpdCB';
 
-  function parseFeatures(features) {
-    return features.map(f => {
-      const a = f.attributes;
-      const typeKey = Object.keys(a).find(k => /incident.type.primary/i.test(k))
-                   || Object.keys(a).find(k => /incident.type/i.test(k))
-                   || Object.keys(a).find(k => /offense/i.test(k)) || '';
-      const addrKey = Object.keys(a).find(k => /address/i.test(k)) || '';
-      const dateKey = Object.keys(a).find(k => /reported.date/i.test(k))
-                   || Object.keys(a).find(k => /date/i.test(k)) || '';
-      const caseKey = Object.keys(a).find(k => /case/i.test(k)) || '';
-      return {
-        type:    typeKey ? a[typeKey] : '',
-        address: addrKey ? a[addrKey] : '',
-        date:    dateKey ? a[dateKey] : null,
-        case_no: caseKey ? a[caseKey] : '',
-        cat:     categorize(typeKey ? a[typeKey] : '')
-      };
-    });
-  }
+  script.onerror = function() {
+    if (loadTimer) { clearTimeout(loadTimer); loadTimer = null; }
+    document.getElementById('refresh-icon').classList.remove('spin');
+    showError('Could not reach Boulder open data.');
+  };
 
-  function markUpdated() {
-    document.getElementById('updated').textContent =
-      'Updated ' + new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-  }
+  // 10-second timeout
+  loadTimer = setTimeout(function() {
+    var el = document.getElementById('_jp');
+    if (el) el.parentNode.removeChild(el);
+    document.getElementById('refresh-icon').classList.remove('spin');
+    showError('Request timed out.');
+  }, 10000);
 
-  function showError() {
-    document.getElementById('list').innerHTML = `<div id="status">
-      <i class="ti ti-wifi-off" style="font-size:24px; color:#555;"></i>
-      Could not reach Boulder open data.<br>
-      <a href="https://experience.arcgis.com/experience/b77f9ce8798b4d61905e2598aee4ec80" target="_blank">View blotter directly →</a>
-    </div>`;
-  }
+  document.head.appendChild(script);
+}
 
-  const ENDPOINTS = [
-    'https://services1.arcgis.com/FPqzYCCMqYjGU82q/arcgis/rest/services/BPD_Crime_Blotter/FeatureServer/0/query?where=1%3D1&outFields=*&orderByFields=REPORTED_DATE+DESC&resultRecordCount=80&f=json',
-    'https://services3.arcgis.com/66aUo8zsujfVXRIT/arcgis/rest/services/BPD_Crime_Blotter/FeatureServer/0/query?where=1%3D1&outFields=*&orderByFields=REPORTED_DATE+DESC&resultRecordCount=80&f=json',
-    'https://services1.arcgis.com/FPqzYCCMqYjGU82q/arcgis/rest/services/Police_Blotter_Daily/FeatureServer/0/query?where=1%3D1&outFields=*&orderByFields=REPORTED_DATE+DESC&resultRecordCount=80&f=json',
-  ];
-
-  async function loadData() {
-    const icon = document.getElementById('refresh-icon');
-    icon.classList.add('spin');
-    document.getElementById('list').innerHTML =
-      '<div id="status"><i class="ti ti-loader spin" style="font-size:20px;"></i> Loading…</div>';
-
-    for (const url of ENDPOINTS) {
-      try {
-        const res = await fetch(url);
-        if (!res.ok) continue;
-        const data = await res.json();
-        if (data.error || !Array.isArray(data.features) || !data.features.length) continue;
-        allIncidents = parseFeatures(data.features);
-        markUpdated();
-        render();
-        icon.classList.remove('spin');
-        return;
-      } catch (e) { continue; }
-    }
-
-    showError();
-    icon.classList.remove('spin');
-  }
-
-  loadData();
-
-  /* Auto-refresh every 10 minutes */
-  setInterval(loadData, 600000);
+startLoad();
+setInterval(startLoad, 600000); // refresh every 10 min
 </script>
 </body>
 </html>
