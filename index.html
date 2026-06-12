@@ -187,24 +187,54 @@ function processData(data) {
     showError('Service returned no data.');
     return;
   }
+
+  // Detect field names from first record, log them for debugging
+  var sample = data.features[0].attributes;
+  var allKeys = Object.keys(sample);
+  console.log('BPD blotter fields:', allKeys.join(', '));
+
+  function pickField(exact, regex) {
+    for (var i = 0; i < exact.length; i++) {
+      if (sample.hasOwnProperty(exact[i])) return exact[i];
+    }
+    for (var i = 0; i < allKeys.length; i++) {
+      if (regex.test(allKeys[i])) return allKeys[i];
+    }
+    return null;
+  }
+
+  var typeKey = pickField(
+    ['Offense_Type','OFFENSE_TYPE','offense_type','OffenseType',
+     'Incident_Type','INCIDENT_TYPE','incident_type','IncidentType',
+     'Crime_Type','CRIME_TYPE','crime_type','Offense','OFFENSE','Type','TYPE'],
+    /offense|incident_type|crime_type/i
+  );
+  var addrKey = pickField(
+    ['Address','ADDRESS','Block_Address','BLOCK_ADDRESS',
+     'Incident_Address','INCIDENT_ADDRESS','Location','LOCATION'],
+    /address|location/i
+  );
+  var dateKey = pickField(
+    ['Report_Date','REPORT_DATE','Reported_Date','REPORTED_DATE',
+     'Incident_Date','INCIDENT_DATE','Date','DATE'],
+    /report_date|reported_date|incident_date|^date$/i
+  );
+  var caseKey = pickField(
+    ['Case_Number','CASE_NUMBER','Report_Number','REPORT_NUMBER',
+     'Case_No','CASE_NO','CaseNumber','ReportNumber'],
+    /case_num|case_no|report_num/i
+  );
+
+  console.log('Mapped — type:', typeKey, '| addr:', addrKey, '| date:', dateKey, '| case:', caseKey);
+
   allIncidents = data.features.map(function(f) {
     var a = f.attributes;
-    var keys = Object.keys(a);
-    var typeKey = keys.find(function(k) { return /offense.type/i.test(k); }) ||
-                  keys.find(function(k) { return /incident.type/i.test(k); }) ||
-                  keys.find(function(k) { return /crime.type/i.test(k); }) || '';
-    var addrKey = keys.find(function(k) { return /^address$/i.test(k); }) ||
-                  keys.find(function(k) { return /address/i.test(k) && !/email/i.test(k); }) || '';
-    var dateKey = keys.find(function(k) { return /report.date/i.test(k); }) ||
-                  keys.find(function(k) { return /incident.date/i.test(k); }) ||
-                  keys.find(function(k) { return /\bdate\b/i.test(k); }) || '';
-    var caseKey = keys.find(function(k) { return /case.number/i.test(k) || /report.number/i.test(k); }) || '';
-    var typeVal = typeKey ? (a[typeKey] || '') : '';
+    var typeVal = (typeKey && a[typeKey]) ? String(a[typeKey]) : '';
     return {
       type:    typeVal,
-      address: addrKey ? (a[addrKey] || '') : '',
-      date:    dateKey ? a[dateKey] : null,
-      case_no: caseKey ? (a[caseKey] || '') : '',
+      address: (addrKey && a[addrKey]) ? String(a[addrKey]) : '',
+      date:    (dateKey && a[dateKey]) ? a[dateKey] : null,
+      case_no: (caseKey && a[caseKey]) ? String(a[caseKey]) : '',
       cat:     categorize(typeVal)
     };
   });
