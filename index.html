@@ -113,11 +113,8 @@ var allIncidents = [];
 var activeFilter = 'all';
 
 // Confirmed service URL from DevTools.
-// We route it through allorigins.win which adds CORS headers to any public URL.
-var ARCGIS_URL = 'https://services.arcgis.com/ePKBjXrBZ2vEEgWd/arcgis/rest/services/BPD_Crime_Incident_Blotter/FeatureServer/0/query?where=1%3D1&outFields=*&orderByFields=Report_Date%20DESC&resultRecordCount=250&returnGeometry=false&f=json';
+var ARCGIS_URL = 'https://services.arcgis.com/ePKBjXrBZ2vEEgWd/arcgis/rest/services/BPD_Crime_Incident_Blotter/FeatureServer/0/query?where=1=1&outFields=*&orderByFields=Report_Date+DESC&resultRecordCount=250&returnGeometry=false&f=json';
 
-// allorigins wraps the response in { contents: "...", status: {...} }
-var PROXY = 'https://api.allorigins.win/get?url=';
 
 var VIOLENT  = ['ASSAULT','ROBBERY','HOMICIDE','RAPE','SEX OFFENSE','KIDNAP','ARSON','WEAPON','THREAT','MENACING','MURDER','BATTERY','SHOOTING','STRANGULATION'];
 var PROPERTY = ['BURGLARY','THEFT','LARCENY','AUTO THEFT','MOTOR VEHICLE','TRESPASS','VANDALISM','DAMAGE','CRIMINAL MISCHIEF','FRAUD','FORGERY','SHOPLIFTING','EMBEZZLE','STOLEN'];
@@ -259,26 +256,33 @@ function startLoad() {
   document.getElementById('list').innerHTML =
     '<div id="status"><i class="ti ti-loader spin" style="font-size:20px;"></i> Loading…</div>';
 
-  var proxyUrl = PROXY + encodeURIComponent(ARCGIS_URL);
+  // Try proxies in order — corsproxy.io first, then thingproxy as fallback
+  var proxies = [
+    'https://corsproxy.io/?' + encodeURIComponent(ARCGIS_URL),
+    'https://thingproxy.freeboard.io/fetch/' + ARCGIS_URL
+  ];
+  var proxyIdx = 0;
 
-  fetch(proxyUrl)
-    .then(function(res) {
-      if (!res.ok) throw new Error('HTTP ' + res.status);
-      return res.json();
-    })
-    .then(function(wrapper) {
-      // allorigins returns { contents: "<json string>", status: {...} }
-      var data = JSON.parse(wrapper.contents);
-      processData(data);
-    })
-    .catch(function(err) {
-      // If allorigins fails, try corsproxy.io as a fallback
-      var fallback = 'https://corsproxy.io/?' + encodeURIComponent(ARCGIS_URL);
-      fetch(fallback)
-        .then(function(res) { return res.json(); })
-        .then(function(data) { processData(data); })
-        .catch(function() { showError('Could not reach Boulder open data.'); });
-    });
+  function tryProxy() {
+    if (proxyIdx >= proxies.length) {
+      showError('Could not reach Boulder open data.');
+      return;
+    }
+    var url = proxies[proxyIdx++];
+    fetch(url)
+      .then(function(res) {
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        return res.json();
+      })
+      .then(function(data) {
+        processData(data);
+      })
+      .catch(function() {
+        tryProxy();
+      });
+  }
+
+  tryProxy();
 }
 
 startLoad();
