@@ -111,10 +111,13 @@
 <script>
 var allIncidents = [];
 var activeFilter = 'all';
-var loadTimer = null;
 
-// Confirmed service URL from DevTools network capture
-var SERVICE_URL = 'https://services.arcgis.com/ePKBjXrBZ2vEEgWd/arcgis/rest/services/BPD_Crime_Incident_Blotter/FeatureServer/0/query';
+// Confirmed service URL from DevTools.
+// We route it through allorigins.win which adds CORS headers to any public URL.
+var ARCGIS_URL = 'https://services.arcgis.com/ePKBjXrBZ2vEEgWd/arcgis/rest/services/BPD_Crime_Incident_Blotter/FeatureServer/0/query?where=1%3D1&outFields=*&orderByFields=Report_Date%20DESC&resultRecordCount=250&returnGeometry=false&f=json';
+
+// allorigins wraps the response in { contents: "...", status: {...} }
+var PROXY = 'https://api.allorigins.win/get?url=';
 
 var VIOLENT  = ['ASSAULT','ROBBERY','HOMICIDE','RAPE','SEX OFFENSE','KIDNAP','ARSON','WEAPON','THREAT','MENACING','MURDER','BATTERY','SHOOTING','STRANGULATION'];
 var PROPERTY = ['BURGLARY','THEFT','LARCENY','AUTO THEFT','MOTOR VEHICLE','TRESPASS','VANDALISM','DAMAGE','CRIMINAL MISCHIEF','FRAUD','FORGERY','SHOPLIFTING','EMBEZZLE','STOLEN'];
@@ -152,7 +155,7 @@ function render() {
     ? allIncidents
     : allIncidents.filter(function(i) { return i.cat === activeFilter; });
   if (!shown.length) {
-    list.innerHTML = '<div id="status">No incidents found for this filter.</div>';
+    list.innerHTML = '<div id="status">No incidents for this filter.</div>';
     return;
   }
   list.innerHTML = shown.slice(0, 100).map(function(inc) {
@@ -179,29 +182,22 @@ function setFilter(btn, cat) {
   render();
 }
 
-// JSONP callback — ArcGIS calls this with the JSON payload
-window.__bpdCB = function(data) {
-  if (loadTimer) { clearTimeout(loadTimer); loadTimer = null; }
-  var el = document.getElementById('_jp');
-  if (el) el.parentNode.removeChild(el);
-
-  document.getElementById('refresh-icon').classList.remove('spin');
-
+function processData(data) {
   if (!data || data.error || !Array.isArray(data.features) || !data.features.length) {
     showError('Service returned no data.');
     return;
   }
-
   allIncidents = data.features.map(function(f) {
     var a = f.attributes;
-    // Field names confirmed from the service: Report_Date, Offense_Type, Address (or similar)
-    // We'll detect them dynamically in case they shift
     var keys = Object.keys(a);
-    var typeKey = keys.find(function(k) { return /offense.type/i.test(k) || /incident.type/i.test(k) || /crime.type/i.test(k); }) || '';
-    var addrKey = keys.find(function(k) { return /address/i.test(k) && !/email/i.test(k); }) || '';
+    var typeKey = keys.find(function(k) { return /offense.type/i.test(k); }) ||
+                  keys.find(function(k) { return /incident.type/i.test(k); }) ||
+                  keys.find(function(k) { return /crime.type/i.test(k); }) || '';
+    var addrKey = keys.find(function(k) { return /^address$/i.test(k); }) ||
+                  keys.find(function(k) { return /address/i.test(k) && !/email/i.test(k); }) || '';
     var dateKey = keys.find(function(k) { return /report.date/i.test(k); }) ||
                   keys.find(function(k) { return /incident.date/i.test(k); }) ||
-                  keys.find(function(k) { return /date/i.test(k); }) || '';
+                  keys.find(function(k) { return /\bdate\b/i.test(k); }) || '';
     var caseKey = keys.find(function(k) { return /case.number/i.test(k) || /report.number/i.test(k); }) || '';
     var typeVal = typeKey ? (a[typeKey] || '') : '';
     return {
@@ -212,17 +208,18 @@ window.__bpdCB = function(data) {
       cat:     categorize(typeVal)
     };
   });
-
   document.getElementById('updated').textContent =
-    'Updated ' + new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    'Updated ' + new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) + ' (48h lag)';
+  document.getElementById('refresh-icon').classList.remove('spin');
   render();
-};
+}
 
 function showError(msg) {
+  document.getElementById('refresh-icon').classList.remove('spin');
   document.getElementById('list').innerHTML =
     '<div id="status">' +
       '<i class="ti ti-wifi-off" style="font-size:24px;color:#555;"></i>' +
-      '<span>' + (msg || 'Could not reach Boulder open data.') + '</span>' +
+      '<span>' + (msg || 'Could not load data.') + '</span>' +
       '<a href="https://experience.arcgis.com/experience/b77f9ce8798b4d61905e2598aee4ec80" target="_blank">View full blotter ↗</a>' +
     '</div>';
 }
@@ -232,41 +229,30 @@ function startLoad() {
   document.getElementById('list').innerHTML =
     '<div id="status"><i class="ti ti-loader spin" style="font-size:20px;"></i> Loading…</div>';
 
-  // Remove any previous script tag
-  var old = document.getElementById('_jp');
-  if (old) old.parentNode.removeChild(old);
+  var proxyUrl = PROXY + encodeURIComponent(ARCGIS_URL);
 
-  var script = document.createElement('script');
-  script.id = '_jp';
-  script.src = SERVICE_URL +
-    '?f=json' +
-    '&cacheHint=true' +
-    '&where=1%3D1' +
-    '&orderByFields=Report_Date%20DESC' +
-    '&outFields=*' +
-    '&resultRecordCount=250' +
-    '&returnGeometry=false' +
-    '&callback=__bpdCB';
-
-  script.onerror = function() {
-    if (loadTimer) { clearTimeout(loadTimer); loadTimer = null; }
-    document.getElementById('refresh-icon').classList.remove('spin');
-    showError('Could not reach Boulder open data.');
-  };
-
-  // 10-second timeout
-  loadTimer = setTimeout(function() {
-    var el = document.getElementById('_jp');
-    if (el) el.parentNode.removeChild(el);
-    document.getElementById('refresh-icon').classList.remove('spin');
-    showError('Request timed out.');
-  }, 10000);
-
-  document.head.appendChild(script);
+  fetch(proxyUrl)
+    .then(function(res) {
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      return res.json();
+    })
+    .then(function(wrapper) {
+      // allorigins returns { contents: "<json string>", status: {...} }
+      var data = JSON.parse(wrapper.contents);
+      processData(data);
+    })
+    .catch(function(err) {
+      // If allorigins fails, try corsproxy.io as a fallback
+      var fallback = 'https://corsproxy.io/?' + encodeURIComponent(ARCGIS_URL);
+      fetch(fallback)
+        .then(function(res) { return res.json(); })
+        .then(function(data) { processData(data); })
+        .catch(function() { showError('Could not reach Boulder open data.'); });
+    });
 }
 
 startLoad();
-setInterval(startLoad, 600000); // refresh every 10 min
+setInterval(startLoad, 600000);
 </script>
 </body>
 </html>
